@@ -1,3 +1,5 @@
+# hola
+
 import time
 from SimpleCV import Camera, Image
 import threading
@@ -29,7 +31,7 @@ class LoopThread(Thread):
         print 'Picture Taken: ' + str(num)
         time.sleep(1. / FPS)
 
-with open('settings.json') as data_file:    
+with open('/home/pi/src/python/bulletCamera/settings.json') as data_file:    
     data = json.load(data_file)
 
 HOST = '10.42.0.' + str(100 + data['cam']['id'])
