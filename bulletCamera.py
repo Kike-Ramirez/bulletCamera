@@ -29,11 +29,12 @@ class LoopThread(Thread):
         print 'Picture Taken: ' + str(num)
         time.sleep(1. / FPS)
 
+with open('settings.json') as data_file:    
+    data = json.load(data_file)
 
-
-HOST = '10.42.0.102'
-PORT = 8000
-FPS = 30
+HOST = '10.42.0.' + str(100 + data['cam']['id'])
+PORT = data['cam']['port']
+FPS = data['cam']['fps']
 
 START_EVENT = Event()
 thread = LoopThread(START_EVENT)
@@ -44,15 +45,10 @@ data = []
 captures = []
 cameraOpen = False
 
-with open('settings.json') as data_file:    
-    data = json.load(data_file)
+
 
 cam = Camera()
 time.sleep(0.5)
-
-
-
-UPLOAD_FOLDER = 'finals/'
 
 app = Flask(__name__)
 
