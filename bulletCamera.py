@@ -12,6 +12,7 @@ from os.path import isfile, join
 import json
 from pprint import pprint
 from io import BytesIO
+import os
 
 
 # Function to capture FNUM frames in a row, and save it in captures global array
@@ -117,34 +118,48 @@ time.sleep(0.5)
 
 app = Flask(__name__)
 
+
+
+def map(value, minOutput, maxOutput, minInput=0, maxInput=100):
+    inputRange = maxInput - minInput
+    outputRange = maxOutput - minOutput
+    valueScaled = float(value - minInput) / float(inputRange)
+
+    return minOutput + (valueScaled * outputRange)
+
+
 @app.route("/set/brightness/<int:number>")
 def setBrightness(number):
-    global data
-
     # INNO Dept: Change brightness to camera using v4l-ctl
+    number = map(number, -64, 64)
+    brightnessCommand = "v4l2-ctl --set-ctrl brightness=" + str(number)
+    os.system(brightnessCommand)
 
     return "BulletCam - Brightness (-64 - 64) changed: " + str(number), 200
 
 @app.route("/set/contrast/<int:number>")
 def setContrast(number):
-    global data
-
+    number = map(number, 0, 95)
+    contrastCommand = "v4l2-ctl --set-ctrl contrast=" + str(number)
+    os.system(contrastCommand)
     # INNO Dept: Change contrast to camera using v4l-ctl
 
     return "BulletCam - Contrast (0 - 95) changed: " + str(number), 2000
 
 @app.route("/set/saturation/<int:number>")
 def setSaturation(number):
-    global data
-
+    number = map(number, 0, 100)
+    saturationCommand = "v4l2-ctl --set-ctrl saturation=" + str(number)
+    os.system(saturationCommand)
     # INNO Dept: Change saturation to camera using v4l-ctl
 
     return "BulletCam - Saturation (0-100) changed: " + str(number), 2000
 
 @app.route("/set/hue/<int:number>")
 def setHue(number):
-    global data
-
+    number = map(number, -2000, 2000)
+    hueCommand = "v4l2-ctl --set-ctrl hue=" + str(number)
+    os.system(hueCommand)
     # INNO Dept: Change hue to camera using v4l-ctl
 
     return "BulletCam  - Hue changed: " + str(number), 2000
@@ -152,16 +167,26 @@ def setHue(number):
 
 @app.route("/set/exposure_auto/<int:number>")
 def setExposure_auto(number):
-    global data
-
     # INNO Dept: Change exposure to camera using v4l-ctl
+    if number == 0:
+        exposure_autoCommand = "v4l2-ctl --set-ctrl exposure_auto=3"
+    elif number == 1:
+        exposure_autoCommand = "v4l2-ctl --set-ctrl exposure_auto=1"
+    os.system(exposure_autoCommand)
 
     return "BulletCam - Auto exposure changed to mode (0-3): " + str(number), 2000
 
+@app.route("/set/exposure/<int:number>")
+def setExposure(number):
+    number = map(number, 50, 1000)
+    exposure_autoCommand = "v4l2-ctl --set-ctrl exposure_absolute=" + str(number)
+    os.system(exposure_autoCommand)
+    # INNO Dept: Change exposure to camera using v4l-ctl
+
+    return "BulletCam - Manual exposure (50-10000) changed: " + str(number), 2000
+
 @app.route("/calibrate")
 def calibrate():
-    global data
-
     logging.debug('Calibration started...')
 
     if not cameraOpen:
@@ -238,6 +263,12 @@ def getFrameNum(number):
 
 # Main entrance
 if __name__ == '__main__':
-    
+    print map(0, 0, 128)
+    print map(50, 0, 128)
+    print map(100, 0, 128)
+
+    print map(0, -128, 128)
+    print map(50, -128, 128)
+    print map(100, -128, 128)
     # Run main app
     app.run(HOST, PORT)

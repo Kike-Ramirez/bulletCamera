@@ -1,0 +1,49 @@
+mkdir src
+cd src
+mkdir python
+cd python
+git clone https://github.com/Kike-Ramirez/bulletCamera
+cd bulletCamera
+sudo apt-get install python-opencv
+sudo pip install simplecv
+sudo apt-get install python-scipy
+
+
+A) CAMBIAR SETTINGS
+
+B) LANZAR MANUALMENTE Y COMPROBAR TODO OK CON NAVEGADOR
+
+C) ACTIVAR COMO SERVICIO
+
+cd /lib/systemd/system/
+sudo nano bulletCam.service
+
+-----------------------
+[Unit]
+Description=Firmware for BulletRing Cameras
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python /home/pi/src/python/bulletCamera/bulletCamera.py
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+
+-----------------------
+
+sudo chmod 644 /lib/systemd/system/bulletCam.service
+chmod +x /home/pi/src/python/bulletCamera/bulletCamera.py
+sudo systemctl daemon-reload
+sudo systemctl enable bulletCam.service
+sudo systemctl start bulletCam.service
+
+
+PARA ADMINISTRACIÓN Y COMPROBACIÓN:
+
+sudo systemctl stop bulletCam.service
+sudo systemctl status bulletCam.service
+sudo systemctl start bulletCam.service
+
+Y!! HTOP
