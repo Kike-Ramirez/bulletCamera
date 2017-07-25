@@ -1,7 +1,7 @@
 
 {
     "cam": {
-        "id": 3,
+        "id": 0,
         "port": 8000,
         "fps": 30,
         "resolution": 768
