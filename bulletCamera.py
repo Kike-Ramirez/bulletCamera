@@ -115,9 +115,6 @@ threads = []
 cam = Camera()
 time.sleep(0.5)
 
-# sendPing = PingStatus( 1 , pingStatus)
-# sendPing.start()
-
 app = Flask(__name__)
 
 @app.route("/set/brightness/<int:number>")
