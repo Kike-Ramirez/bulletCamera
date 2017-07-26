@@ -91,13 +91,15 @@ logging.basicConfig(level=logging.DEBUG,
                     format='[%(levelname)s] (%(threadName)-10s) %(message)s',
                     )
 
-with open('/home/pi/src/python/bulletCamera/status.json') as data_file:    
+with open('/home/pi/src/python/bulletCamera/settings.json') as data_file:    
     data = json.load(data_file)
 
 HOST = '10.42.0.' + str(100 + data['cam']['id'])
 PORT = data['cam']['port']
 FPS = data['cam']['fps']
 FNUM = FPS * 5
+
+print 'HOST' + HOST
 
 CAM_WIDTH = data['cam']['width']
 CAM_HEIGHT = data['cam']['height']
