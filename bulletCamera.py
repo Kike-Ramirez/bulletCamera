@@ -136,15 +136,17 @@ data['cam']['tracked'] = False
 data['cam']['onFocus'] = False
 
 
-targets = [ [ data['cal']['target1x'] * img.width, data['cal']['target1y'] * img.height, data['cal']['target1r'] * img.width ], 
-    [ data['cal']['target2x'] * img.width, data['cal']['target2y']* img.height, data['cal']['target2r']* img.width ] ] 
-
-
 prop_map = { "width": data['cam']['width'], "height": data['cam']['height']  }
 
 cam = Camera(camera_index = data['cam']['index'], prop_set = prop_map, threaded = True, calibrationfile = '')
 
 time.sleep(0.5)
+
+img = cam.getImage()
+
+targets = [ [ data['cal']['target1x'] * img.width, data['cal']['target1y'] * img.height, data['cal']['target1r'] * img.width ], 
+    [ data['cal']['target2x'] * img.width, data['cal']['target2y']* img.height, data['cal']['target2r']* img.width ] ] 
+
 
 app = Flask(__name__)
 
