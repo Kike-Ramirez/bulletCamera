@@ -11,8 +11,9 @@
         "height": 1080,
         "hue": 0.5,
         "saturation": 0.5,
-        "value": 0.5,
-        "exposure": 0.5,
+        "brightness": 0.5,
+        "exposure_auto": 0.0,
+        "exposure": 0.5, 
         "contrast": 0.5
         
         },
@@ -40,7 +41,9 @@
     	"area1y": 0.3,
     	"area1w": 0.4,
     	"area1h": 0.4,
-    	"tracked": false
+    	"tracked": false,
+    	"calibrated": false,
+    	"onFocus": false
 
     },
 
