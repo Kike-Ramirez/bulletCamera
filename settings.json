@@ -7,8 +7,8 @@
         "port": 8000,
         "index": 0,
         "fps": 30,
-        "width": 1920,
-        "height": 1080,
+        "width": 640,
+        "height": 480,
         "hue": 0.5,
         "saturation": 0.5,
         "value": 0.5,
@@ -48,8 +48,8 @@
 
     	"fps": 12,
     	"frameNumber": 60,
-    	"width": 768,
-    	"height": 768 
+    	"width": 480,
+    	"height": 480 
     }
 
 }
