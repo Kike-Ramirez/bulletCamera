@@ -23,7 +23,7 @@ import math
 # --------------------------------------------------
 def cameraCapture():
 
-    global cam, captures, cameraOpen
+    global cam, captures, cameraOpen, FNUM
 
     logging.debug('Capture thread started')
 
@@ -32,6 +32,7 @@ def cameraCapture():
     captures = []
 
     for num in range(FNUM):
+        logging.debug('Capturing: ' + str(num))
         img = cam.getImage()
         captures.append(img)
         time.sleep(1. / FPS)
@@ -79,33 +80,7 @@ def pingStatus():
 
 
 
-# Function to send nth frame to server (just once)
-# --------------------------------------------------
-def sendFrame(number):
-    global captures, cameraOpen, data
 
-    logging.debug('SendFrame thread started')
-
-    if not cameraOpen:
-
-        if number >= 0 and number < FNUM:
-
-            # Create a memory file to save capture and send it via HTTP to server
-            byte_io = BytesIO()
-            captures[number].save(byte_io, 'PNG')
-            byte_io.seek(0)
-
-            return send_file(byte_io, mimetype='image/png')         
-
-        else:
-
-            return "BulletCam - Error: index out of range", 404
-
-    else:
-
-        return "BulletCam - Error: camera still working - try again in 5 seconds", 404
-
-    logging.debug('SendFrame thread finished')
 
 
 
@@ -136,15 +111,19 @@ data['cam']['tracked'] = False
 data['cam']['onFocus'] = False
 
 
-targets = [ [ data['cal']['target1x'] * img.width, data['cal']['target1y'] * img.height, data['cal']['target1r'] * img.width ], 
-    [ data['cal']['target2x'] * img.width, data['cal']['target2y']* img.height, data['cal']['target2r']* img.width ] ] 
 
 
 prop_map = { "width": data['cam']['width'], "height": data['cam']['height']  }
 
-cam = Camera(camera_index = data['cam']['index'], prop_set = prop_map, threaded = True, calibrationfile = '')
+cam = Camera(camera_index = data['cam']['index'], threaded = True)
 
 time.sleep(0.5)
+
+img = cam.getImage()
+
+targets = [ [ data['cal']['target1x'] * img.width, data['cal']['target1y'] * img.height, data['cal']['target1r'] * img.width ], 
+    [ data['cal']['target2x'] * img.width, data['cal']['target2y']* img.height, data['cal']['target2r']* img.width ] ] 
+
 
 app = Flask(__name__)
 
@@ -237,28 +216,28 @@ def trackTargets(img):
 
     # OPTION 2: Test in better lighting conditions (color matching - best candidate)
 
-    # logging.debug('SimpleCV: Calculating masks...')
+    logging.debug('SimpleCV: Calculating masks...')
     # black_mask = img.colorDistance(color=(0, 0, 0)).binarize()
     # # Totem color=(165, 178, 94)
-    # distance = img.colorDistance(color=(255, 0, 0)).invert()
+    distance = img.hueDistance(color=(165, 178, 94)).invert().binarize(threshold=100)
 
-    # logging.debug('SimpleCV: Finding blobs...')
-    # blobs = (distance).findBlobs()
+    logging.debug('SimpleCV: Finding blobs...')
+    blobs = (distance).findBlobs()
 
-    # logging.debug('SimpleCV: Detecting circles...')
-    # if blobs is not None:
-    #     circles = [b for b in blobs if b.isCircle(0.5)]
-    #     if len(circles) == 0:
-    #         logging.debug('SimpleCV: No circles detected')
-    #         return None
+    logging.debug('SimpleCV: Detecting circles...')
+    if blobs is not None:
+        circles = [b for b in blobs if b.isCircle(0.5)]
+        if len(circles) == 0:
+            logging.debug('SimpleCV: No circles detected')
+            return None
 
-    # # loop over the (x, y) coordinates and radius of the circles
-    # for c in circles:
-    #     # draw the circle in the output image
-    #     rad = c.radius()
-    #     if (data['cal']['minRadioTarget'] < rad) and (data['cal']['maxRadioTarget'] > rad):
-    #         logging.debug('SimpleCV: Drawing circles...')         
-    #         img.drawCircle((c.x, c.y), c.radius(),SimpleCV.Color.BLUE,3)
+    # loop over the (x, y) coordinates and radius of the circles
+    for c in circles:
+        # draw the circle in the output image
+        rad = c.radius()
+        if (data['cal']['minRadioTarget'] < rad) and (data['cal']['maxRadioTarget'] > rad):
+            logging.debug('SimpleCV: Drawing circles...')         
+            img.drawCircle((c.x, c.y), c.radius(),SimpleCV.Color.BLUE,3)
 
     return targets
 
@@ -368,12 +347,12 @@ def calibrate():
         targets = trackTargets(img2)
 
         # Check if we are on focus
-        if (targets[0].x >= data['cal']['area1x']) and
-        (targets[0].x <= data['cal']['area1x'] + data['cal']['area1w']) and 
-        (targets[0].y >= data['cal']['area1y']) and 
-        (targets[0].y <= data['cal']['area1y'] + data['cal']['area1h']):
+        if (targets[0].x >= data['cal']['area1x']) and (targets[0].x <= (data['cal']['area1x'] + data['cal']['area1w'])): 
+            if (targets[0].y >= data['cal']['area1y']) and (targets[0].y <= (data['cal']['area1y'] + data['cal']['area1h'])):
 
-            data['cal']['onFocus'] = True
+                data['cal']['onFocus'] = True
+
+        distance = img2.hueDistance(color=(165, 178, 94)).invert().binarize(threshold=100)
 
         # Draw screen indicators
         drawArea(img2)
@@ -384,7 +363,7 @@ def calibrate():
         logging.debug('Saving image into memory file')
         # Create a memory file to save capture and send it via HTTP to server
         byte_io = BytesIO()
-        img2.save(byte_io, 'PNG')
+        distance.save(byte_io, 'PNG')
         byte_io.seek(0)
         logging.debug('Picture saved into memory file')
 
