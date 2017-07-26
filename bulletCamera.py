@@ -368,12 +368,12 @@ def calibrate():
         targets = trackTargets(img2)
 
         # Check if we are on focus
-        if (targets[0].x >= data['cal']['area1x']) and
-        (targets[0].x <= data['cal']['area1x'] + data['cal']['area1w']) and 
-        (targets[0].y >= data['cal']['area1y']) and 
-        (targets[0].y <= data['cal']['area1y'] + data['cal']['area1h']):
+        # if (targets[0].x >= data['cal']['area1x']) and
+        # (targets[0].x <= data['cal']['area1x'] + data['cal']['area1w']) and 
+        # (targets[0].y >= data['cal']['area1y']) and 
+        # (targets[0].y <= data['cal']['area1y'] + data['cal']['area1h']):
 
-            data['cal']['onFocus'] = True
+        #     data['cal']['onFocus'] = True
 
         # Draw screen indicators
         drawArea(img2)
