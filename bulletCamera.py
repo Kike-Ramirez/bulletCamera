@@ -18,6 +18,7 @@ from io import BytesIO
 import os
 import numpy
 import math
+import socket
 
 # Function to capture FNUM frames in a row, and save it in captures global array
 # --------------------------------------------------
@@ -94,7 +95,7 @@ logging.basicConfig(level=logging.DEBUG,
 with open('/home/pi/src/python/bulletCamera/settings.json') as data_file:    
     data = json.load(data_file)
 
-HOST = '10.42.0.' + str(100 + data['cam']['id'])
+HOST = [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
 PORT = data['cam']['port']
 FPS = data['cam']['fps']
 FNUM = FPS * 5
@@ -116,9 +117,11 @@ data['cam']['onFocus'] = False
 
 
 
-prop_map = { "width": data['cam']['width'], "height": data['cam']['height']  }
+#prop_map = { "width": data['cam']['width'], "height": data['cam']['height']  }
 
-cam = Camera(camera_index = data['cam']['index'], threaded = True)
+#cam = Camera(camera_index = data['cam']['index'], threaded = True)
+
+cam = Camera()
 
 time.sleep(0.5)
 
@@ -342,31 +345,31 @@ def calibrate():
         cameraOpen = False
 
         # Downscale image to speed up processing
-        img2 = img.resize(1024, 576)
+        img2 = img.resize(1024, 768)
 
-        # Detect totems and send back position to server
-        logging.debug('SimpleCV: Detecting reference totems...')
+        # # Detect totems and send back position to server
+        # logging.debug('SimpleCV: Detecting reference totems...')
 
-        targets = trackTargets(img2)
+        # targets = trackTargets(img2)
 
-        # Check if we are on focus
-        if (targets[0].x >= data['cal']['area1x']) and (targets[0].x <= (data['cal']['area1x'] + data['cal']['area1w'])): 
-            if (targets[0].y >= data['cal']['area1y']) and (targets[0].y <= (data['cal']['area1y'] + data['cal']['area1h'])):
+        # # Check if we are on focus
+        # if (targets[0].x >= data['cal']['area1x']) and (targets[0].x <= (data['cal']['area1x'] + data['cal']['area1w'])): 
+        #     if (targets[0].y >= data['cal']['area1y']) and (targets[0].y <= (data['cal']['area1y'] + data['cal']['area1h'])):
 
-                data['cal']['onFocus'] = True
+        #         data['cal']['onFocus'] = True
 
-        distance = img2.hueDistance(color=(165, 178, 94)).invert().binarize(threshold=100)
+        # distance = img2.hueDistance(color=(165, 178, 94)).invert().binarize(threshold=100)
 
         # Draw screen indicators
-        drawArea(img2)
+        # drawArea(img2)
         drawGrid(img2)
-        drawCircles(img2)
+        # drawCircles(img2)
 
 
         logging.debug('Saving image into memory file')
         # Create a memory file to save capture and send it via HTTP to server
         byte_io = BytesIO()
-        distance.save(byte_io, 'PNG')
+        img2.save(byte_io, 'PNG')
         byte_io.seek(0)
         logging.debug('Picture saved into memory file')
 
