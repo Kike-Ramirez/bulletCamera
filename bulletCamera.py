@@ -36,7 +36,7 @@ def cameraCapture():
         logging.debug('Capturing: ' + str(num))
         img = cam.getImage()
 	img = img.resize(1024, 768)
-        crop(img)
+	img = crop(img)
 	captures.append(img)
         time.sleep(1. / FPS)
 
@@ -201,7 +201,7 @@ def rotate(img):
 def crop(img):
     global data
 
-    output = img.crop(x = img.width * 0.5 , y = img.height * 0.5 , w = data['output']['height'], h = data['output']['height'], centered=True )
+    output = img.crop(x = img.width * 0.5 , y = img.height * 0.5 , w = 768, h = 768, centered=True )
 
     logging.debug('SimpleCV: Imaged Cropped')
 
@@ -348,6 +348,7 @@ def calibrate():
 
         # Downscale image to speed up processing
         img = img.resize(1024, 768)
+	img = crop(img)
 
         # # Detect totems and send back position to server
         # logging.debug('SimpleCV: Detecting reference totems...')
