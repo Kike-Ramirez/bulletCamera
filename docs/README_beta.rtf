@@ -1,0 +1,119 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red164\green8\blue0;\red0\green0\blue0;
+}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\csgenericrgb\c64314\c3137\c0;\csgenericrgb\c0\c0\c0;
+}
+\paperw11900\paperh16840\margl1440\margr1440\vieww17120\viewh13740\viewkind0
+\deftab720
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f0\fs28 \cf2 \expnd0\expndtw0\kerning0
+\
+\
+sudo raspi-config\
+	console-login\
+	keyboard language\
+	ssh\
+\
+apt-get update\
+apt-get upgrade\
+apt-get dist-upgrade\
+apt-get install htop\
+\
+\cf3 \'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\cf2 \
+\
+mkdir src\
+cd src\
+mkdir python\
+cd python\
+git clone https://github.com/Kike-Ramirez/bulletCamera\
+cd bulletCamera\
+sudo apt-get install python-opencv\
+sudo pip install simplecv\
+sudo apt-get install python-scipy\
+\
+\
+A) CAMBIAR SETTINGS, id: n\'ba de raspberry\
+\
+B) LANZAR MANUALMENTE Y COMPROBAR TODO OK CON NAVEGADOR\
+\
+C) ACTIVAR COMO SERVICIO\
+\
+cd /lib/systemd/system/\
+sudo nano bulletCam.service\
+\
+-----------------------\
+[Unit]\
+Description=Firmware for BulletRing Cameras\
+After=multi-user.target\
+\
+[Service]\
+Type=simple\
+ExecStart=/usr/bin/python /home/pi/src/python/bulletCamera/bulletCamera.py\
+Restart=on-abort\
+\
+[Install]\
+WantedBy=multi-user.target\
+\
+-----------------------\
+\
+sudo chmod 644 /lib/systemd/system/bulletCam.service\
+chmod +x /home/pi/src/python/bulletCamera/bulletCamera.py\
+sudo systemctl daemon-reload\
+sudo systemctl enable bulletCam.service\
+sudo systemctl start bulletCam.service\
+\
+\
+PARA ADMINISTRACI\'d3N Y COMPROBACI\'d3N:\
+\
+sudo systemctl stop bulletCam.service\
+sudo systemctl status bulletCam.service\
+sudo systemctl start bulletCam.service\
+\
+Y!! HTOP\
+\
+\cf3 \'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\cf2 \
+clusterssh en server para sincronizar cambios\
+\cf3 \'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\cf2 \
+\
+\
+v4l2-ctl --list-ctrls\
+\
+\'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 brightness (int) \'a0 \'a0: min=-64 max=64 step=1 default=-8193 value=0\
+\'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 contrast (int) \'a0 \'a0: min=0 max=95 step=1 default=57343 value=32\
+\'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 saturation (int) \'a0 \'a0: min=0 max=100 step=1 default=57343 value=55\
+\'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 hue (int) \'a0 \'a0: min=-2000 max=2000 step=1 default=-8193 value=0\
+		white_balance_temperature_auto (bool) \'a0 : default=1 value=1\
+\'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 gamma (int) \'a0 \'a0: min=100 max=300 step=1 default=57343 value=165\
+\'a0 \'a0 \'a0 \'a0 \'a0 \'a0	power_line_frequency (menu) \'a0 : min=0 max=2 default=1 value=1\
+\'a0 \'a0 \'a0 		white_balance_temperature (int) \'a0 \'a0: min=2800 max=6500 step=10 default=61432 value=4600 flags=inactive\
+		sharpness (int) \'a0 \'a0: min=1 max=7 step=1 default=57343 value=2\
+\'a0 \'a0 \'a0 \'a0 \'a0		backlight_compensation (int) \'a0 \'a0: min=0 max=1 step=1 default=57343 value=0\
+\cf3 		exposure_auto (menu) \'a0 : min=0 max=3 default=0 value=3\
+			\cf4 1) manual\
+			3) auto\cf3 \
+		exposure_absolute (int) \'a0 \'a0: min=50 max=10000 step=1 default=166 value=166 flags=inactive\
+			\cf0 solo si exporsure_auto == 1\cf2 \
+\
+\
+\
+example:\
+	v4l2-ctl \'97set-ctrl brightness=0\
+\cf3 \'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\
+\cf2 \
+instalar ffmeg:\
+	
+\f1\fs24 apt-get install libav-tools \
+
+\f0\fs28 	
+\f1\fs24 apt-get install ffmpeg
+\f0\fs28 \
+\
+comprimir videos con ffmpeg\
+	ffmpeg -r 60 -f image2 -s 768x768 -i pictures/los_amos_del_low_%05d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p movies/test.mp4\
+\
+\cf3 \'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\
+\
+\cf2 instalar python-qrcode:\
+	https://github.com/lincolnloop/python-qrcode}
