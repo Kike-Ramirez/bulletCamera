@@ -98,8 +98,8 @@ with open('/home/pi/src/python/bulletCamera/settings.json') as data_file:
 
 HOST = [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
 PORT = data['cam']['port']
-FPS = data['cam']['fps']
-FNUM = FPS * 5
+FPS = 12
+FNUM = 100
 
 print 'HOST' + HOST
 
