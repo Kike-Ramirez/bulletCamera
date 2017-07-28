@@ -35,7 +35,9 @@ def cameraCapture():
     for num in range(FNUM):
         logging.debug('Capturing: ' + str(num))
         img = cam.getImage()
-        captures.append(img)
+	img = img.resize(1024, 768)
+        crop(img)
+	captures.append(img)
         time.sleep(1. / FPS)
 
     cameraOpen = False
@@ -199,7 +201,7 @@ def rotate(img):
 def crop(img):
     global data
 
-    output = img.crop(x = img.width * 0.5 , y = img.height * 0.5 , w = data['output']['width'], h = data['output']['height'], centered=True )
+    output = img.crop(x = img.width * 0.5 , y = img.height * 0.5 , w = data['output']['height'], h = data['output']['height'], centered=True )
 
     logging.debug('SimpleCV: Imaged Cropped')
 
@@ -345,7 +347,7 @@ def calibrate():
         cameraOpen = False
 
         # Downscale image to speed up processing
-        img2 = img.resize(1024, 768)
+        img = img.resize(1024, 768)
 
         # # Detect totems and send back position to server
         # logging.debug('SimpleCV: Detecting reference totems...')
@@ -362,14 +364,14 @@ def calibrate():
 
         # Draw screen indicators
         # drawArea(img2)
-        drawGrid(img2)
+        drawGrid(img)
         # drawCircles(img2)
 
 
         logging.debug('Saving image into memory file')
         # Create a memory file to save capture and send it via HTTP to server
         byte_io = BytesIO()
-        img2.save(byte_io, 'PNG')
+        img.save(byte_io, 'PNG')
         byte_io.seek(0)
         logging.debug('Picture saved into memory file')
 

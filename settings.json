@@ -51,8 +51,8 @@
 
     	"fps": 12,
     	"frameNumber": 60,
-    	"width": 480,
-    	"height": 480 
+    	"width": 1024,
+    	"height": 768 
     }
 
 }
