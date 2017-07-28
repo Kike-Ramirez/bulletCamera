@@ -36,7 +36,6 @@ def cameraCapture():
         logging.debug('Capturing: ' + str(num))
         img = cam.getImage()
 	img = img.resize(1024, 768)
-	img = crop(img)
 	captures.append(img)
         time.sleep(1. / FPS)
 
@@ -348,7 +347,6 @@ def calibrate():
 
         # Downscale image to speed up processing
         img = img.resize(1024, 768)
-	img = crop(img)
 
         # # Detect totems and send back position to server
         # logging.debug('SimpleCV: Detecting reference totems...')
